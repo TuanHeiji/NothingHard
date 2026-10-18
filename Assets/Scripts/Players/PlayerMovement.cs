@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public InputAction MoveAction;
+    [Header("Joystick")]
+    public Joystick joystick;
 
     [Header("Movement")]
     public float walkSpeed = 3f;
@@ -42,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
         m_Rigidbody = GetComponent<Rigidbody>();
         m_Animator = GetComponent<Animator>();
         currentHP = maxHP;
-        MoveAction.Enable();
+        
     }
 
     private void FixedUpdate()
@@ -60,11 +61,24 @@ public class PlayerMovement : MonoBehaviour
     // =========================
     private void Move()
     {
-        Vector2 input = MoveAction.ReadValue<Vector2>();
+        // Đọc input từ Joystick Pack
+        if (joystick == null)
+        {
+            m_Movement = Vector3.zero;
+            return;
+        }
+
+        Vector2 input = new Vector2(
+            joystick.Horizontal,
+            joystick.Vertical
+        );
+
         input = Vector2.ClampMagnitude(input, 1f);
 
         if (input.magnitude < 0.1f)
             input = Vector2.zero;
+
+
 
         Camera cam = Camera.main;
         if (cam == null)
@@ -266,8 +280,8 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, attackRadius);
     }
 
-    private void OnDestroy()
-    {
-        MoveAction.Disable();
-    }
+    //private void OnDestroy()
+    //{
+    //    MoveAction.Disable();
+    //}
 }
